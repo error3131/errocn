@@ -1,0 +1,227 @@
+1. Calculating all the parameters of an optical fiber
+clc;
+clear all;
+close all;
+a = input('Enter core RI ');
+b = input('Cladding RI ');
+w = input('Cladding Wavelength in nm ');
+rad = input('Radius in um ');
+NA = a*sqrt(1-((b*b)/(a*a)));
+Aa = asind(sqrt((a*a)-(b*b)));
+Ca = asind(b/a);
+del = ((a*a)-(b*b))/(2*(a*a));
+v=2*pi()/(w*10^-9)*rad*10^-6*NA;
+m=v*v/2;
+m1=uint8(m);
+disp('Numerical Aperture is ');
+disp(NA);
+disp('Acceptance Angle is ');
+disp(Aa);
+disp('Critical Angle is ');
+disp(Ca);
+disp('Index difference is ');
+disp(del);
+disp('Normalized frequency is ');
+disp(v);
+disp('Number of modes are is ');
+disp(m1);
+
+2. Rayleigh’s Coefficient
+clc
+clear all
+close all
+n=1.46;
+p=0.286;
+b=7*10^-11;
+k=1.381*10^-23;
+T=1400;
+w1=input('enter the three wavelengths in um = ');
+for i=1:3
+    w(i)=w1(i)*10^-6;
+    YR(i)=(8*(pi^3)/(3*(w(i)^4)))*(n^8)*(p^2)*b*k*T*1000;
+    disp('Rayleighs constant in /km = ');
+    disp(YR(i));
+    loss(i)=exp(-YR(i));
+    L(i)=10*log10(1/loss(i));
+    disp('Loss in dB/km = ');
+    disp(L(i));
+end
+
+w2=850:100:1550;
+wx=w2*10^-9;
+YR1=(8*(pi^3)*(n^8)*(p^2)*b*k*T*1000)./(3*(wx.^4));
+loss2=exp((-1).*YR1);
+L2=10*log10(1./loss2);
+plot(wx,L2);
+
+3. Material Dispersion
+lamda=850;
+C=3*10^(5);
+L=1;
+x=0.025;
+sigmaX=0.0012;
+sigmaL=20
+M=(0.025*10^(12))/(lamda*C);
+disp('M= ');
+disp(M);
+sigmaM1=(sigmaL*L*0.025*10^(9))/(C*lamda);
+sigmaM2=(sigmaX*lamda*L*x*10^(9))/(C*lamda);
+disp('sigmaM1=');
+disp(sigmaM1);
+disp('sigmaM2= ');
+disp(sigmaM2); 
+lamda1=850:100:1550;
+Mx=(0.025*10^(12))./(lamda1*C);
+plot(Mx,lamda1);
+title('Material Dispersion Characteristics');
+ylabel('Material dispersion');
+xlabel('Wavelengh in nm');
+
+4. Intramodal Dispersion
+clc
+clear all
+close all
+So=input(‘Enter So’);
+Wo=input(‘Enter Wo’);
+n2=1.48;
+refr=0.002;
+c=3*10^5;
+w=1250:5:1600;
+z=zeros(length(w));
+constant=0.26;
+Dwg=((-1)*n2*refr*constant*power(10,12))./(c.*w);
+Dt=(w.*So.*(1-(Wo./w).^(4)))/(4);
+Dm=Dt-Dwg;
+figure(1);
+plot(w,Dwg,'green')
+xlabel('Wavelength in nm');
+ylabel('Dispersion');
+title('Intramodal Dispersion in Single mode Fibre')
+hold on
+plot(w,z,'black')
+plot(w,Dt,'blue')
+plot(w,Dm,'red')
+hold off
+gtext('Dwg')
+gtext('z')
+gtext('Dm')
+gtext('Dt')
+
+Outputs:
+1. So= 0.097
+wo= 1310
+Intersection with Zero Line : Dt=1310nm	Dm=1290nm
+
+2. So= 0.070
+wo= 1550
+Intersection with Zero Line : Dt=1550nm	   Dm=1530nm
+
+5. Soliton
+clc
+clear all
+close all
+i=sqrt(-1);
+t=-5:0.1:5
+ e=0:(pi/8):(pi/2)
+for t1=1:length(t)
+for e1=1:length(e)
+u1(t1)=(sech(t(t1)).*exp((i.*e(e1))/2));
+u2(t1)=(4.*exp((i.*e(e1))/2)).*((cosh(3.*t(t1))+(3.*cosh(t(t1)).*exp(i*4.*e(e1))))./(cosh(4.*t(t1))+(4.*cosh(2.*t(t1)))+(3.*cos(4.*e(e1)))));
+end
+end
+disp('First order Soliton');
+disp(u1);
+disp('Second order Soliton');
+disp(u2);
+subplot(2,2,1);
+plot(t,abs(u1));
+title('First Order Soliton')
+xlabel('t')
+ylabel('u')
+subplot(2,2,2);
+ribbon(t,abs(u1));
+title('First Order Soliton 3D')
+subplot(2,2,3);
+plot(t,abs(u2));
+title('Second Order Soliton')
+xlabel('t')
+ylabel('u')
+subplot(2,2,4);
+ribbon(t,abs(u2));
+title('Second Order Soliton 3D')
+
+6. Link Power Budget
+Part 1: Finding Length
+clc;
+clear all;
+close all;
+ps=(-13);
+pr=(-42);
+lc=2*1;
+alpha=3.5;
+s=6;
+pt=ps-pr;
+l=(pt-lc-s)/alpha;
+disp('Length is ');
+disp(l);
+length=0:0.5:6;
+power=ps-(alpha.*length);
+plot(length,power);
+title('Power vs Length');
+xlabel('Length');
+ylabel('Power');
+
+Part 2: Finding System Margin
+clc;
+clear all;
+close all;
+ps=3;
+l=60;
+pr=(-32);
+lc=2*1*2;
+alpha=0.3;
+jl=3*2;
+pt=ps-pr;
+sm=pt-(alpha*l)-jl-lc;
+disp('System Margin= ');
+disp(sm);
+length=0:5:60;
+power=ps-(alpha.*length);
+plot(length,power);
+title('Power vs Length');
+xlabel('Length');
+ylabel('Power');
+
+7. EDFA
+clc
+clear all
+close all
+ps=190*10^(-6);
+ls1=1510;
+ls2=1560;
+lp1=980;
+lp2=1480;
+pp=0:200;
+pp=pp/(10^6);
+pout1=ps+((lp1/ls1).*pp);
+pout2=ps+((lp2/ls1).*pp);
+pout3=ps+((lp1/ls2).*pp);
+pout4=ps+((lp2/ls2).*pp);
+figure(1)
+subplot(2,1,1);
+hold on
+plot(pp,pout1)
+plot(pp,pout2)
+hold off
+title('For ls=1510nm');
+xlabel('Input Power in W');
+ylabel('Output Power in W');
+subplot(2,1,2)
+hold on
+plot(pp,pout3)
+plot(pp,pout4)
+hold off
+title('For ls=1560nm');
+xlabel('Input Power in W');
+ylabel('Output Power in W');
+
